@@ -1,0 +1,15 @@
+subprojects {
+    version = VERSION
+    group = GROUP
+
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'maven'
+
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+        maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
+        maven { url 'http://maven.dev.elenet.me/nexus/content/groups/public/' }
+    }
+}

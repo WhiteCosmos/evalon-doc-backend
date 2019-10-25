@@ -1,0 +1,6 @@
+#Tue, 22 Oct 2019 22:11:45 +0800
+
+info.app.version=2.2.0-SNAPSHOT
+info.app.name=evalon-core
+grails.env=development
+info.app.grailsVersion=3.3.8

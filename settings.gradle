@@ -1,0 +1,3 @@
+rootProject.name = 'evalon-doc-backend'
+include 'evalon-common'
+include 'evalon-core'

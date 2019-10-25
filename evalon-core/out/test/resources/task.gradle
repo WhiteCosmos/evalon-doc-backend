@@ -1,0 +1,20 @@
+task listElemeDependencies {
+    Set<String> set = []
+    if (project.subprojects) {
+        project.subprojects.each { sp ->
+            sp.configurations.compile.getDependencies().each {
+                String coor = "${it.group}:${it.name}:${it.version}"
+                if (set.add(coor) && it.group.startsWith("me.ele")) {
+                    println coor
+                }
+            }
+        }
+    } else {
+        project.configurations.compile.getDependencies().each {
+            String coor = "${it.group}:${it.name}:${it.version}"
+            if (set.add(coor) && it.group.startsWith("me.ele")) {
+                println coor
+            }
+        }
+    }
+}
