@@ -12,6 +12,10 @@ class JavadocHelper {
 
         def javaDoc = n.getJavadoc().get()
 
+        if (!javaDoc.toText()) {
+            return ""
+        }
+
         return javaDoc.toText().readLines().first() // read first line of javadoc
     }
 
@@ -21,6 +25,10 @@ class JavadocHelper {
         }
 
         def javaDoc = n.getJavadoc().get()
+
+        if (!javaDoc.toText()) {
+            return ""
+        }
 
         return javaDoc.description.toText()
     }

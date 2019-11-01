@@ -46,6 +46,8 @@ class DocService {
                     repositoryName   : repo.repositoryName,
                     projectId        : project.projectId,
                     projectName      : project.projectName,
+                    groupId          : project.groupId,
+                    versionId        : project.versionId,
                     defaultBranchName: "master",
                     teamName         : "",
                     modules          : [],
@@ -258,11 +260,6 @@ class DocService {
                 throw new OperationFailedException("没有发现Gradle或Maven配置文件，请确认是否为JAVA项目")
             }
 
-            //TODO 查询该项目/分支是否已经注册过
-
-//            def registeredModules = queryRegisteredModules(p)
-
-            //TODO 在前端展示服务器异常
 
             if (projectBuilder.usingGradle(projectDir)) {
                 projectDir.eachDirRecurse { dir ->
@@ -303,11 +300,29 @@ class DocService {
             workspace && workspace.deleteDir()
         }
 
+        def registeredModules = queryRegisteredModules(projectId)
+
+        modules.each { m ->
+            def rm = registeredModules.find {
+                it.moduleName == m.moduleName
+            }
+
+            if (rm) {
+                m.appName = rm.appName
+
+                m.registered = true
+            }
+        }
+
         modules = modules.sort {
             it.moduleName
         }
 
         return modules
+    }
+
+    def queryRegisteredModules(int projectId) {
+        return ModuleDomain.findAllByProjectId(projectId)
     }
 
     // Favorites Api

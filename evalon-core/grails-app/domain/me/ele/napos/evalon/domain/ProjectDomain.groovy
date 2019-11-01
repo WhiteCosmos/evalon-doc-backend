@@ -7,9 +7,17 @@ class ProjectDomain { // 1 -> N ModuleDomain
 
     String projectName
 
+    String groupId = ""
+
+    String versionId = "" // version is occupied
+
     static mapWith = "mongo"
 
     static constraints = {
         projectId unique: true
+
+        groupId nullable: true
+
+        versionId nullable: true
     }
 }

@@ -61,7 +61,7 @@ class CoreService {
 
                 resolverPayload.projectDir = projectDir
 
-                resolverPayload.moduleDirs = getModuleDirs(projectDir, docPayload.modules)
+                resolverPayload.moduleDirs = getModuleDirs(projectDir, docPayload.modules, buildSystem)
 
                 resolverPayload.classLoader = classLoader
 
@@ -70,6 +70,7 @@ class CoreService {
                 resolverPayload.report = report
 
                 // Resolve
+                docResolver.resolvePackage(resolverPayload)
 
                 registryLogger.log(RegistryMessage.RESOLVING_SERVICES)
 
@@ -121,6 +122,10 @@ class CoreService {
         try {
             def repositoryDomain = saveRepository(dp.repository)
 
+            dp.project.groupId = rp.groupId
+
+            dp.project.versionId = rp.versionId
+
             saveProject(repositoryDomain, dp.project)
 
             rp.createdBranches = rp.createdBranches.findAll {
@@ -137,11 +142,6 @@ class CoreService {
 
             return
         }
-
-//        try {
-//        } catch (Exception e) {
-//            report.addException("覆盖文档发生异常", null, e)
-//        }
     }
 
     private saveRepository(Repository repository) {
@@ -158,10 +158,18 @@ class CoreService {
         def projectDomain = ProjectDomain.findByProjectId(project.projectId)
 
         if (!projectDomain) {
-            projectDomain = new ProjectDomain(repositoryId: repositoryDomain.id, projectId: project.projectId, projectName: project.projectName).save(flush: true)
+            projectDomain = new ProjectDomain(
+                    repositoryId: repositoryDomain.id,
+                    projectId: project.projectId)
         }
 
-        return projectDomain
+        projectDomain.projectName = project.projectName
+
+        projectDomain.groupId = project.groupId
+
+        projectDomain.versionId = project.versionId
+
+        return projectDomain.save(flush: true)
     }
 
     private saveModulesAndBranches(List<ModuleDomain> createdModules, List<BranchDomain> createdBranches) {
@@ -216,26 +224,38 @@ class CoreService {
         }
     }
 
-    private getModuleDirs(File projectDir, List<Module> modules) {
+    private getModuleDirs(File projectDir, List<Module> modules, BuildSystem buildSystem) {
         def dirs = []
 
         if (modules.size() > 1) {
             modules = modules.findAll { it.needRegistry }
         }
 
-        def moduleNames = modules.collect { it.moduleName }
-
         if (modules.size() == 1 && modules.head().moduleName == projectDir.name) { // Only one module itself
             return [projectDir]
         }
 
         projectDir.eachDirRecurse {
-            if (it.isDirectory() && it.name in moduleNames) {
+            if (isModuleDir(it, modules, buildSystem)) {
                 dirs << it
             }
         }
 
         return dirs
+    }
+
+    private boolean isModuleDir(File dir, List<Module> modules, BuildSystem buildSystem) {
+        if (!dir.isDirectory()) {
+            return false
+        }
+
+        if (!dir.listFiles().any {
+            return it.isFile() && it.name == buildSystem.buildFile
+        }) {
+            return false
+        }
+
+        return dir.name in modules.collect { it.moduleName }
     }
 
     private initResolverPayload(DocPayload payload) {
@@ -328,6 +348,14 @@ class CoreService {
 
         def addedModules = newValues.findAll {
             !(it.moduleName in commonModules.collect { it.moduleName })
+        }
+
+        commonModules.each { cm ->
+            def newVal = newValues.find {
+                cm.moduleName == it.moduleName
+            }
+
+            cm.appName = newVal.appName
         }
 
         return [

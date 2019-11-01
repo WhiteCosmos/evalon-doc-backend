@@ -1,9 +1,15 @@
 package me.ele.napos.evalon
 
 enum BuildSystem {
-    GRADLE, // Build By Gradle
+    GRADLE("build.gradle"), // Build By Gradle
 
-    MAVEN, // Build By Maven
+    MAVEN("pom.xml"), // Build By Maven
 
-    UNKNOWN,
+    UNKNOWN("unknown")
+
+    String buildFile
+
+    BuildSystem(String buildFile) {
+        this.buildFile = buildFile
+    }
 }

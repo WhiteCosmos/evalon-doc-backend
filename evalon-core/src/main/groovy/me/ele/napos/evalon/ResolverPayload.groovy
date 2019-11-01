@@ -13,6 +13,10 @@ class ResolverPayload {
 
     BuildSystem buildSystem = BuildSystem.UNKNOWN
 
+    String groupId
+
+    String versionId
+
     ProjectRegistryReport report
 
     List<ModuleDomain> createdModules = []

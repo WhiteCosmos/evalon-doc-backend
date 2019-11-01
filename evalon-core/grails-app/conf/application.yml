@@ -1,9 +1,9 @@
 # Gitlab Configuration
 
 gitlab:
-  gitlabUrl: "gitlab url"
+  gitlabUrl: gitlab_url
 
-  gitlabToken: "gitlab token"
+  gitlabToken: gitlab_token
 
 ---
 server:
@@ -47,8 +47,7 @@ endpoints:
 ---
 grails:
   mongodb:
-    #    host: localhost
-    host: adcz-dev-napos-team-10.vm.elenet.me
+    host: localhost
     port: 27017
     databaseName: evalon_doc
   mime:

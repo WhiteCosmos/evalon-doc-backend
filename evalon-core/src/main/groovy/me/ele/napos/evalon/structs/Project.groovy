@@ -5,6 +5,10 @@ class Project {
 
     String projectName
 
+    String groupId
+
+    String versionId
+
     String projectDescription
 
     String defaultBranchName

@@ -17,6 +17,26 @@ class DocResolver {
     @Autowired
     private ProjectBuilder projectBuilder
 
+    def resolvePackage(ResolverPayload payload) {
+        def projectDir = payload.projectDir.listFiles().first()
+
+        def f = projectDir.listFiles().find {
+            return it.isFile() && it.name == "gradle.properties"
+        }
+
+        if (!f) {
+            return
+        }
+
+        Properties p = new Properties()
+
+        p.load(f.newInputStream())
+
+        payload.groupId = p.getProperty("GROUP", "")
+
+        payload.versionId = p.getProperty("VERSION", "")
+    }
+
     def resolveServices(ResolverPayload payload) {
         def moduleDirs = payload.moduleDirs
 
@@ -70,7 +90,7 @@ class DocResolver {
                     try {
                         !service && r.match(clazz) && (service = r.resolve(clazz))
                     } catch (Exception e) {
-                        e.printStackTrace()
+                        report.addException("服务 ${qualifiedName.split("\\.").last()} 解析失败", null, e)
                     }
                 }
 
@@ -183,13 +203,13 @@ class DocResolver {
                 try {
                     service && new JavaServiceCommentVisitor().visit(JavaParser.parse(javaFile), service)
                 } catch (Exception e) {
-                    report.addException("", null, e)
+                    report.addException("读取服务 ${service.serviceName} 注释失败", null, e)
                 }
 
                 try {
                     pojo && new JavaPojoCommentVisitor().visit(JavaParser.parse(javaFile), pojo)
                 } catch (Exception e) {
-                    report.addException("", null, e)
+                    report.addException("读取结构体 ${pojo.simpleName} 注释失败", null, e)
                 }
             }
         }

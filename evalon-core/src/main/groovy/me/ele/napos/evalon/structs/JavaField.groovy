@@ -30,7 +30,7 @@ class JavaField {
 
     List<JavaField> fields = []
 
-    String toJsonStr(int layer = 0) {
+    String toJsonStr(int layer = 0, boolean underContainer = false) {
         if (JavaFieldHelper.isString(this)) {
             return "${space(layer)}\"${fieldName}\" : \"\", ${comment()}"
         }
@@ -79,7 +79,9 @@ class JavaField {
             def child = fields.first()
 
             if (JavaFieldHelper.isObject(child)) {
-                sb.append("${space(layer)}\"${fieldName}\" : [\n")
+                if (!underContainer) {
+                    sb.append("${space(layer)}\"${fieldName}\" : [\n")
+                }
 
                 sb.append(child.toJsonStr(layer + 1))
 
@@ -88,13 +90,51 @@ class JavaField {
                 return sb.toString()
             }
 
+//            if (JavaFieldHelper.isMap(child)) {
+//
+//            }
+
             sb.append("${space(layer)}\"${fieldName}\" : [],\n")
 
             return sb.toString()
         }
 
         if (JavaFieldHelper.isMap(this)) {
-            return "${space(layer)}${fieldName} : null,\n"
+//            def keyField = this.fields[0]
+//
+//            def valueField = this.fields[1]
+//
+//            def key = ""
+//
+//            def value = ""
+//
+//            if (JavaFieldHelper.isString(keyField)) {
+//                key = "key"
+//            }
+//
+//            if (JavaFieldHelper.isNumber(keyField)) {
+//                key = -1
+//            }
+//
+//            if (JavaFieldHelper.isEnum(keyField)) {
+//                key = keyField.fields.first().fieldName
+//            }
+
+
+//            if (JavaFieldHelper.isString(valueField)) {
+//                value = "value"
+//            }
+//
+//            if (JavaFieldHelper.isNumber(valueField)) {
+//                value = -1
+//            }
+//
+//            if (JavaFieldHelper.isBoolean(valueField)) {
+//                value = false
+//            }
+
+
+            return "${space(layer)}${fieldName} : { },\n"
         }
 
         return "${space(layer)}${fieldName} : null,\n"
